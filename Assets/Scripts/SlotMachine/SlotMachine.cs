@@ -37,7 +37,7 @@ public class SlotMachine : MonoBehaviour
         StartCoroutine(OffsetToggleReels());
     }
 
-    void CheckForWins(int minGroupAmount = 5)
+    void CheckForWins(int minGroupAmount = 3)
     {
         List<List<SlotMachineSymbol>> allSymbols = new List<List<SlotMachineSymbol>>();
 
@@ -112,6 +112,19 @@ public class SlotMachine : MonoBehaviour
             {
                 symbol.PlayBreakAnimation();
             }
+        }
+
+        StartCoroutine(WaitForBreakAndDropMissingSymbols());
+    }
+
+    IEnumerator WaitForBreakAndDropMissingSymbols()
+    {
+        yield return new WaitForSeconds(0.5f); // Replace with something better like callback
+
+        //Wait until all break animations have finished
+        foreach (SlotMachineReel reel in reels)
+        {
+            reel.DropMissingSymbols();
         }
     }
 

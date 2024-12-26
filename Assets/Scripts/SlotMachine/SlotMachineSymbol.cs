@@ -6,21 +6,31 @@ public class SlotMachineSymbol : MonoBehaviour
     public Image image;
 
     [SerializeField] SlotMachineSymbolObject[] symbolObjects;
-
     [SerializeField] UISpriteAnimation breakAnimation;
     [SerializeField] UISpriteAnimation idleAnimation;
 
     public SlotMachineSymbolObject symbol;
     public int symboldID => symbol.id;
 
-    void Awake()
+    private bool broken = false;
+    public bool IsBroken => broken;
+
+    [HideInInspector] public SlotMachineReel reel;
+
+
+    public void Init(SlotMachineReel reel)
     {
-        SetRandomSprite();
+        this.reel = reel;
+        SetRandomSymbol();
     }
 
     public void SetSymbol(SlotMachineSymbolObject symbol)
     {
         this.symbol = symbol;
+        broken = false;
+
+        image.enabled = true;
+        image.sprite = symbol.idleSprites[0];
 
         breakAnimation.sprites = symbol.breakingSprites;
         idleAnimation.sprites = symbol.idleSprites;
@@ -29,7 +39,7 @@ public class SlotMachineSymbol : MonoBehaviour
         idleAnimation.PlayLoop();
     }
 
-    public void SetRandomSprite()
+    public void SetRandomSymbol()
     {
         SlotMachineSymbolObject randomSymbol = symbolObjects[Random.Range(0, symbolObjects.Length)];
         SetSymbol(randomSymbol);
@@ -38,6 +48,12 @@ public class SlotMachineSymbol : MonoBehaviour
     public void PlayBreakAnimation()
     {
         idleAnimation.Stop();
-        breakAnimation.PlayOnce(() => this.image.enabled = false);
+        breakAnimation.PlayOnce(OnBreakAnimationFinish);
+        broken = true;
+    }
+
+    private void OnBreakAnimationFinish()
+    {
+        image.enabled = false;
     }
 }
